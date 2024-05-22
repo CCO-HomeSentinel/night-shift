@@ -19,7 +19,6 @@ class MySQLConnection:
             Session = sessionmaker(bind=self.engine)
             self.session = Session()
 
-            self.Base.metadata.create_all(self.engine)
         except Exception as e:
             print(f'Erro ao conectar com o banco de dados. {e}')
 
