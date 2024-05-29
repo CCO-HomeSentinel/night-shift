@@ -11,13 +11,6 @@ from service.process import initialize_spark
 
 load_dotenv()
 
-ENABLE_LOGS = os.getenv("ENABLE_LOGS").lower() == "true"
-
-if ENABLE_LOGS:
-    logger = Logger()
-else:
-    logger = None
-
 def setup_database():
     mysql_connection = MySQLConnection()
     session = mysql_connection.get_session()
@@ -26,9 +19,11 @@ def setup_database():
 
     return relacoes
 
+
 def setup_spark():
     spark = initialize_spark()
     return spark
+
 
 def setup_api():
     app = create_app()
