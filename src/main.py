@@ -1,32 +1,31 @@
 import os
-import time
+from src.config.logger import Logger
 from dotenv import load_dotenv
-import schedule
 from connection.MySQLConnection import MySQLConnection
+from service.process import process
+from functools import partial
 
 load_dotenv()
 
-HORA_TURNO = os.getenv('HORA_TURNO')
-MINUTO_TURNO = os.getenv('MINUTO_TURNO')
-TEMPO_ATUALIZACAO = int(os.getenv('TEMPO_ATUALIZACAO'))
+ENABLE_LOGS = os.getenv("ENABLE_LOGS").lower() == "true"
 
-def set_up():
+if ENABLE_LOGS:
+    logger = Logger()
+
+if os.getenv("INTERVALO_BACKUP") is None:
+    INTERVALO_BACKUP = 1
+
+def set_up_database():
     mysql_connection = MySQLConnection()
     session = mysql_connection.get_session()
-    # dados a serem catalogados
+    relacoes = mysql_connection.mapper_query()
     session.close()
 
-def task():
-    print("Chamar código existente")
+    return partial(process, relacoes)
 
 def main():
-    set_up()
-    horario = f"{HORA_TURNO}:{MINUTO_TURNO}"
-    schedule.every().day.at(horario).do(task)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(TEMPO_ATUALIZACAO)
+    set_up_database(logger)
+    
 
 if __name__ == '__main__':
     main()

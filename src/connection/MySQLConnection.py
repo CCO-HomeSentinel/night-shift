@@ -36,3 +36,13 @@ class MySQLConnection:
             result = connection.execute(text(query))
             results = result.fetchall()
             return results
+        
+    def mapper_query(self):
+        query = '''
+            SELECT ss.id, ms.id, ms.tipo, ms.total_bateria
+            FROM home_sentinel.sensor ss
+                JOIN home_sentinel.modelo_sensor ms ON ss.modelo_sensor_id = ms.id
+                ORDER BY ss.id;
+        '''
+        results = self.execute_select_query(query)
+        return results
