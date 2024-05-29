@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from config.logger import Logger
 from connection.MySQLConnection import MySQLConnection
 from api.app import create_app
 from service.process import initialize_spark
@@ -17,7 +16,7 @@ def setup_database():
     relacoes = mysql_connection.mapper_query()
     session.close()
 
-    return relacoes
+    return relacoes, session
 
 
 def setup_spark():

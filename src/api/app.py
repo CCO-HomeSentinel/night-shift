@@ -5,19 +5,12 @@ from dotenv import load_dotenv
 import threading
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from config.logger import Logger
-from connection.MySQLConnection import MySQLConnection
+from config.logger import logger
 from service.process import process
 
 load_dotenv()
 
-ENABLE_LOGS = os.getenv("ENABLE_LOGS").lower() == "true"
 FLASK_ENDPOINT = os.getenv("FLASK_ENDPOINT")
-
-if ENABLE_LOGS:
-    logger = Logger()
-else:
-    logger = None
 
 def create_app():
     app = Flask(__name__)
@@ -33,11 +26,11 @@ def create_app():
             thread.start()
 
             message = f"Requisição recebida e em processamento. Nome: {name}"
-            logger.info(message)
+            logger.log("info", message)
             return accepted(message)
         else:
             message = "Não encontrado chave 'name' em body"
-            logger.error(message)
+            logger.log("error", message)
             return bad_request("Não encontrado chave 'name' em body")
 
     return app

@@ -1,15 +1,24 @@
+import os
+import sys
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from config.logger import logger
 
 def initialize_spark():
-    # logger.info("Iniciando Spark")
+    logger.log("info", "Iniciando Spark")
     return 'objeto spark'
 
-def process(self, filename=None, logger=None):
-    if logger:
-        logger.info(f"Processando arquivo {filename}")
+def process(self, filename=None):
+    logger.log("info", f"Processando arquivo {filename}")
 
     dados = trazer_arquivo(filename)
     dados_reduzidos = reduzir_redundancia(dados)
@@ -20,16 +29,20 @@ def process(self, filename=None, logger=None):
 
 
 def trazer_arquivo(filename):
+    logger.log("info", f"Buscando no bucket: {BUCKET_NAME}")
     print("traga o arquivo aqui")
 
 
-def reduzir_redundancia():
+def reduzir_redundancia(dados):
+    logger.log("info", "Reduzindo redundancia dos dados")
     print("reduza a redundancia aqui")
 
 
 def tabularizar(dados):
+    logger.log("info", f"Realizando carga de dados no banco de dados: {MYSQL_DATABASE}")
     print("tabularize os dados aqui")
 
 
-def criar_kpis():
+def criar_kpis(dados):
+    logger.log("info", f"Realizando carga de dados de KPIs no banco de dados: {MYSQL_DATABASE}")
     print("crie os kpis aqui")

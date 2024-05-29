@@ -39,7 +39,7 @@ class SingletonLogger:
             os.makedirs(path)
 
         handler = TimedRotatingFileHandler(
-            log_file, when="midnight", backupCount=INTERVALO_BACKUP_LOGGER
+            log_file, when="midnight", backupCount=INTERVALO_BACKUP_LOGGER, encoding="utf-8"
         )
         handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -59,3 +59,5 @@ class SingletonLogger:
 
             log_method = log_methods.get(mode, self.logger.info)
             log_method(message)
+
+logger = SingletonLogger()
