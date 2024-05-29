@@ -1,20 +1,23 @@
 import os
-import sys
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 load_dotenv()
+
+MYSQL_HOST = os.getenv('MYSQL_HOST')
+MYSQL_PORT = int(os.getenv('MYSQL_PORT'))
+MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
+MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 
 
 class MySQLConnection:
     def __init__(self):
         try:
             self.engine = create_engine(
-                f"mysql://{os.getenv('MYSQL_USERNAME')}:{os.getenv('MYSQL_PASSWORD')}@"
-                f"{os.getenv('MYSQL_HOST')}:{int(os.getenv('MYSQL_PORT'))}/{os.getenv('MYSQL_DATABASE')}"
+                f"mysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
+                f"{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
             )
             Session = sessionmaker(bind=self.engine)
             self.session = Session()

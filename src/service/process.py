@@ -3,8 +3,8 @@ from pyspark.sql import SparkSession
 import numpy as np
 import pandas as pd
 
-def initialize_spark(logger):
-    logger.info("Iniciando Spark")
+def initialize_spark():
+    # logger.info("Iniciando Spark")
     return 'objeto spark'
 
 def process(self, filename=None, logger=None):
