@@ -29,7 +29,7 @@ def create_app():
         if 'name' in data:
             name = data['name']
 
-            thread = threading.Thread(target=process, args=(name, logger,))
+            thread = threading.Thread(target=process, args=(name,))
             thread.start()
 
             message = f"Requisição recebida e em processamento. Nome: {name}"
