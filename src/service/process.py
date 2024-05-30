@@ -13,12 +13,23 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from config.logger import logger
 
+spark = None
+
 def initialize_spark():
     logger.log("info", "Iniciando Spark")
-    return 'objeto spark'
+    # spark = SparkSession.builder.appName("app").getOrCreate()
+
+
+def initialize_database(engine_pronta):
+    logger.log("info", "Iniciando conexão com o banco de dados")
+    global engine
+    engine = engine_pronta
+
 
 def process(self, filename=None):
     logger.log("info", f"Processando arquivo {filename}")
+    global connection
+    connection = engine.connect()
 
     dados = trazer_arquivo(filename)
     dados_reduzidos = reduzir_redundancia(dados)
@@ -46,3 +57,5 @@ def tabularizar(dados):
 def criar_kpis(dados):
     logger.log("info", f"Realizando carga de dados de KPIs no banco de dados: {MYSQL_DATABASE}")
     print("crie os kpis aqui")
+
+    connection.close()

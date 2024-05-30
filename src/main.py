@@ -11,10 +11,10 @@ FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 def main():
     logger.log("info", "Iniciando aplicação")
     
-    relacoes = setup_database()
+    setup_database()
     logger.log("info", "Banco de dados conectado com sucesso.")
 
-    spark = setup_spark()
+    setup_spark()
     logger.log("info", "Spark iniciado com sucesso.")
 
     app = setup_api()
