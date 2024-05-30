@@ -1,32 +1,26 @@
+from config.setup import setup_database, setup_spark, setup_api
 import os
-import time
 from dotenv import load_dotenv
-import schedule
-from connection.MySQLConnection import MySQLConnection
+from config.logger import logger 
 
 load_dotenv()
+PORT = int(os.getenv("FLASK_PORT", 80))
+FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
-HORA_TURNO = os.getenv('HORA_TURNO')
-MINUTO_TURNO = os.getenv('MINUTO_TURNO')
-TEMPO_ATUALIZACAO = int(os.getenv('TEMPO_ATUALIZACAO'))
-
-def set_up():
-    mysql_connection = MySQLConnection()
-    session = mysql_connection.get_session()
-    # dados a serem catalogados
-    session.close()
-
-def task():
-    print("Chamar código existente")
 
 def main():
-    set_up()
-    horario = f"{HORA_TURNO}:{MINUTO_TURNO}"
-    schedule.every().day.at(horario).do(task)
+    logger.log("info", "Iniciando aplicação")
+    
+    setup_database()
+    logger.log("info", "Banco de dados conectado com sucesso.")
 
-    while True:
-        schedule.run_pending()
-        time.sleep(TEMPO_ATUALIZACAO)
+    setup_spark()
+    logger.log("info", "Spark iniciado com sucesso.")
+
+    app = setup_api()
+    app.run(debug=FLASK_DEBUG, port=PORT)
+    logger.log("info", "Aplicação iniciada com sucesso.")
+
 
 if __name__ == '__main__':
     main()
