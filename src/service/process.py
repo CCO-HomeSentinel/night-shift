@@ -2,6 +2,7 @@ import os
 import sys
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
+import pyspark.sql.functions as F
 import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
@@ -48,6 +49,16 @@ def process(self, filename=None):
 def trazer_arquivo(filename):
     logger.log("info", f"Buscando no bucket: {BUCKET_NAME}")
     print("traga o arquivo aqui")
+    
+    #le o arquivo no bucket s3
+    df = spark.read.json(f"s3a://hs-s3-bronze-dev/{filename}")
+    
+    #transforma o json em dados tabulares e depois em um df pandas
+    df_exploded = df.withColumn("reading", F.explode("registros"))
+    df_tabular = df_exploded.select("reading.*")
+    df_show = df_tabular.toPandas()
+
+    return df_show
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")
@@ -56,6 +67,12 @@ def trazer_arquivo(filename):
 def reduzir_redundancia(dados):
     logger.log("info", "Reduzindo redundancia dos dados")
     print("reduza a redundancia aqui")
+    
+    #tratamento das colunas do dataframe
+    df_reduzido = dados
+    df_reduzido['timestamp'] = pd.to_datetime(df_reduzido['timestamp'])
+    df_reduzido['valor'] = df_reduzido['valor'].replace({'false': 0, 'true': 1})
+    df_reduzido['valor'] = pd.to_numeric(df_reduzido['valor'])
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")

@@ -1,7 +1,6 @@
 import os
 import sys
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -18,20 +17,15 @@ MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 
 class MySQLConnection:
     def __init__(self):
-        try:
-            self.engine = create_engine(
-                f"mysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
-                f"{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
-            )
-            Session = sessionmaker(bind=self.engine)
-            self.session = Session()
+        self.engine = create_engine(
+            f"mysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
+            f"{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
+        )
 
-        except Exception as e:
-            logger.log("error", f'Erro ao conectar com o banco de dados. {e}')
 
-    def get_session(self):
-        return self.session
-
+    def get_connection(self):
+        return self.engine.connect()
+    
     def close_connection(self):
         self.session.close()
 
