@@ -15,12 +15,22 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from config.logger import logger
+from connection.MySQLConnection import MySQLConnection
+
+global dict_baterias 
+
+global conn_hs 
+conn_hs = MySQLConnection("home_sentinel")
+
+global conn_gold
+conn_gold = MySQLConnection("gold")
 
 
 def initialize_spark():
     logger.log("info", "Iniciando Spark")
     global spark
-    # spark = SparkSession.builder.appName("app").getOrCreate()
+    
+    spark = SparkSession.builder.master("local[*]").appName("app").getOrCreate()
 
 
 def initialize_database(engine_pronta):
@@ -31,8 +41,6 @@ def initialize_database(engine_pronta):
 
 def process(self, filename=None):
     logger.log("info", f"Processando arquivo {filename}")
-    global connection
-    connection = engine.connect()
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")
@@ -41,7 +49,6 @@ def process(self, filename=None):
     dados = trazer_arquivo(filename)
     dados_reduzidos = reduzir_redundancia(dados)
     tabularizar(dados_reduzidos)
-    criar_kpis(dados)
     
     print("main do tratamento")
 
@@ -74,21 +81,57 @@ def reduzir_redundancia(dados):
     df_reduzido['valor'] = df_reduzido['valor'].replace({'false': 0, 'true': 1})
     df_reduzido['valor'] = pd.to_numeric(df_reduzido['valor'])
 
+    #agrupando o df por sensor e retirando a média do valor
+    grouped = df_reduzido.groupby(['sensor_id', pd.Grouper(key='timestamp', freq='H')])
+    df_resampled = grouped['valor'].apply(calculate_statistic).reset_index()
+    
+    #criando um df com as informações de bateria
+    df_baterias_resampled = grouped['bateria'].apply(calculate_statistic).reset_index()
+
+    #unindo informações de bateria no df final
+    df_resampled['bateria'] = df_baterias_resampled['bateria']
+
+    #realizando um select no banco para obter as informações de bateria e calcular a porcentagem do sensor
+    query = "select sensor.id, sensor.modelo_sensor_id, modelo_sensor.total_bateria from sensor join modelo_sensor on modelo_sensor.id = sensor.modelo_sensor_id;"
+
+    resultado = conn_hs.execute(text(query))
+    baterias = resultado.mappings().all()
+    
+    dict_baterias = {}
+
+    for i in range(len(baterias)):
+        dict_baterias[i+1] = baterias[i]['total_bateria']
+    
+    #criando a coluna porcentagem bateria e realizando os calculos
+    df_resampled['porcentagem_bateria'] = df_resampled.apply(calcular_porcentagem_bateria, axis=1)
+
+    return df_resampled
+
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")
 
 def tabularizar(dados):
     logger.log("info", f"Realizando carga de dados no banco de dados: {MYSQL_DATABASE}")
     print("tabularize os dados aqui")
-
+    
+    dados.to_sql(con = conn_gold.get_engine(), if_exists='append', name="registro_hora")
+    
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")
 
-def criar_kpis(dados):
-    logger.log("info", f"Realizando carga de dados de KPIs no banco de dados: {MYSQL_DATABASE}")
-    print("crie os kpis aqui")
+def calculate_statistic(group):
+    if group.name[0] in [3, 5]:
+        return group.mode()[0] if not group.mode().empty else np.nan
+    else:
+        return group.mean()
+    
+def apply_battery_value(group):
+    return group['bateria'].iloc[0]
 
-    # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
-    # ou também o banco via connection.execute(text"SELECT * FROM tabela")
 
-    connection.close()
+def calcular_porcentagem_bateria(row):
+    sensor_id = row['sensor_id']
+    valor_atual = row['bateria']
+    valor_maximo = dict_baterias.get(sensor_id)
+    
+    return (valor_atual / valor_maximo) * 100

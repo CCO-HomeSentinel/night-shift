@@ -10,10 +10,10 @@ from service.process import initialize_spark, initialize_database
 
 load_dotenv()
 
-def setup_database():
-    mysql_connection = MySQLConnection()
+# def setup_database():
+#     mysql_connection = MySQLConnection()
 
-    initialize_database(mysql_connection.engine)
+#     initialize_database(mysql_connection.engine)
 
 
 def setup_spark():
