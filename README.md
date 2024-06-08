@@ -46,9 +46,7 @@ To run this project, you will need to add the following environment variables to
 
 
 
-Adicione etiquetas de algum lugar, como: [shields.io](https://shields.io/)
-
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 [![MIT License](https://img.shields.io/badge/language-python-blue.svg)](https://choosealicense.com/licenses/mit/)
 
