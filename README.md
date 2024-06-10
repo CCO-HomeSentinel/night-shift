@@ -36,6 +36,14 @@ To run this project, you will need to add the following environment variables to
 
 `INTERVALO_BACKUP_LOGGER`
 
+`JWT_SECRET_KEY`
+
+`JWT_ALGORITHM`
+
+`SECRET_KEY`
+
+`JWT_TIME`
+
 ## Authors
 
 - [@IgorRegali](https://www.github.com/IgorRegali)

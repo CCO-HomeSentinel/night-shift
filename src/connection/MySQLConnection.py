@@ -23,26 +23,25 @@ class MySQLConnection:
                 f"mysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
                 f"{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
             )
-            Session = sessionmaker(bind=self.engine)
-            self.session = Session()
 
         except Exception as e:
             logger.log("error", f'Erro ao conectar com o banco de dados. {e}')
 
-    def get_session(self):
-        return self.session
 
     def close_connection(self):
-        self.session.close()
+        self.engine.dispose()
+
 
     def return_dict(self, obj):
         return {col.name: getattr(obj, col.name) for col in obj.__table__.columns}
+
 
     def execute_select_query(self, query):
         with self.engine.connect() as connection:
             result = connection.execute(text(query))
             results = result.fetchall()
             return results
+        
         
     def mapper_query(self):
         query = '''
