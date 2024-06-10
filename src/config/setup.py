@@ -12,8 +12,6 @@ load_dotenv()
 
 def setup_database():
     mysql_connection = MySQLConnection()
-    session = mysql_connection.get_session()
-    session.close()
 
     initialize_database(mysql_connection.engine)
 

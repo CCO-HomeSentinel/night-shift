@@ -6,6 +6,7 @@ import threading
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from config.logger import logger
+from api.config.auth import token_required
 from service.process import process
 
 load_dotenv()
@@ -16,7 +17,8 @@ def create_app():
     app = Flask(__name__)
 
     @app.route(FLASK_ENDPOINT, methods=['POST'])
-    def synchronize():
+    @token_required
+    def synchronize(current_user):
         data = request.get_json()
 
         if 'name' in data:
@@ -35,8 +37,10 @@ def create_app():
 
     return app
 
+
 def accepted(message):
     return jsonify({"message": message}), 202
+
 
 def bad_request(message):
     return jsonify({"error": message}), 400
