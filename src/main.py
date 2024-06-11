@@ -1,4 +1,4 @@
-from config.setup import setup_database, setup_spark, setup_api
+from config.setup import setup_spark, setup_api
 import os
 from dotenv import load_dotenv
 from config.logger import logger 
@@ -11,8 +11,8 @@ FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 def main():
     logger.log("info", "Iniciando aplicação")
     
-    setup_database()
-    logger.log("info", "Banco de dados conectado com sucesso.")
+    # setup_database()
+    # logger.log("info", "Banco de dados conectado com sucesso.")
 
     setup_spark()
     logger.log("info", "Spark iniciado com sucesso.")
