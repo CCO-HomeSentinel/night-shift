@@ -26,17 +26,21 @@ class MySQLConnection:
     def get_connection(self):
         return self.engine.connect()
     
+    
     def close_connection(self):
-        self.session.close()
+        self.engine.dispose()
+
 
     def return_dict(self, obj):
         return {col.name: getattr(obj, col.name) for col in obj.__table__.columns}
+
 
     def execute_select_query(self, query):
         with self.engine.connect() as connection:
             result = connection.execute(text(query))
             results = result.fetchall()
             return results
+        
         
     def mapper_query(self):
         query = '''
