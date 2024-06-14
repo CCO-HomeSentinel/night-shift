@@ -18,7 +18,7 @@ def main():
     logger.log("info", "Spark iniciado com sucesso.")
 
     app = setup_api()
-    app.run(debug=FLASK_DEBUG, port=PORT)
+    app.run(host="0.0.0.0", debug=FLASK_DEBUG, port=PORT)
     logger.log("info", "Aplicação iniciada com sucesso.")
 
 
