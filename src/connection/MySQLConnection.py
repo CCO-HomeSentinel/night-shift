@@ -18,7 +18,7 @@ MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 class MySQLConnection:
     def __init__(self, database):
         self.engine = create_engine(
-            f"mysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
+            f"mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@"
             f"{MYSQL_HOST}:{MYSQL_PORT}/{database}"
         )
 

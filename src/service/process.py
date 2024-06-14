@@ -39,7 +39,7 @@ def initialize_database(engine_pronta):
     engine = engine_pronta
 
 
-def process(self, filename=None):
+def process(filename=None):
     logger.log("info", f"Processando arquivo {filename}")
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
