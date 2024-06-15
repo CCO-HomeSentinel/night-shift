@@ -58,7 +58,7 @@ def trazer_arquivo(filename):
     print("traga o arquivo aqui")
     
     #le o arquivo no bucket s3
-    df = spark.read.json(f"s3a://hs-s3-bronze-dev/{filename}")
+    df = pd.read_json(f"s3a://hs-s3-bronze-dev/{filename}")
     
     #transforma o json em dados tabulares e depois em um df pandas
     df_exploded = df.withColumn("reading", F.explode("registros"))
