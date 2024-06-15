@@ -4,7 +4,9 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 import numpy as np
-import pandas as pd
+import pandas as pd 
+import s3fs
+import json
 from dotenv import load_dotenv
 from sqlalchemy import text
 
@@ -57,14 +59,26 @@ def trazer_arquivo(filename):
     logger.log("info", f"Buscando no bucket: {BUCKET_NAME}")
     print("traga o arquivo aqui")
     
-    #le o arquivo no bucket s3
-    df = pd.read_json(f"s3a://hs-s3-bronze-dev/{filename}")
+    # #le o arquivo no bucket s3
+    # df = pd.read_json(f"s3a://hs-s3-bronze-dev/{filename}")
     
-    #transforma o json em dados tabulares e depois em um df pandas
+    # #transforma o json em dados tabulares e depois em um df pandas
+    # df_exploded = df.explode("registros")
+    # df_tabular = df_exploded["registros"].apply(pd.Series)
+   
+
+    # Cria um cliente S3
+    s3 = s3fs.S3FileSystem(anon=False)
+
+    with s3.open(f"s3a://hs-s3-bronze-dev/{filename}") as f:
+        data = json.load(f)
+
+    # Aplainar o JSON aninhado
+    df = pd.json_normalize(data['registros'])
+    
     df_exploded = df.explode("registros")
     df_tabular = df_exploded["registros"].apply(pd.Series)
     
-
     return df_tabular
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
