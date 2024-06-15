@@ -61,11 +61,11 @@ def trazer_arquivo(filename):
     df = pd.read_json(f"s3a://hs-s3-bronze-dev/{filename}")
     
     #transforma o json em dados tabulares e depois em um df pandas
-    df_exploded = df.withColumn("reading", F.explode("registros"))
-    df_tabular = df_exploded.select("reading.*")
-    df_show = df_tabular.toPandas()
+    df_exploded = df.explode("registros")
+    df_tabular = df_exploded["registros"].apply(pd.Series)
+    
 
-    return df_show
+    return df_tabular
 
     # É possível reutilizar o spark por aqui, basta chamar spark.metodo()
     # ou também o banco via connection.execute(text"SELECT * FROM tabela")
